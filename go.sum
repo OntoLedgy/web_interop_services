@@ -1,4 +1,2 @@
-github.com/OntoLedgy/web_interop_services v0.0.0-20211230171815-8da1a856e052 h1:g/hHMbyrmudoNVLU7QWssg/Udu5n4meDjiLQ1FsJJ4Q=
-github.com/OntoLedgy/web_interop_services v0.0.0-20211230171815-8da1a856e052/go.mod h1:NXBRJTduaKC9eq8PbV5y4YPw8ntLPdBx8ivLiWVedVg=
 github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=
 github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=

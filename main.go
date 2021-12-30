@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/OntoLedgy/web_interop_services/code/services/websocket"
+	"github.com/OntoLedgy/web_interop_services_backend/code/services/websocket"
 )
 
 func serveWs(w http.ResponseWriter, r *http.Request) {
