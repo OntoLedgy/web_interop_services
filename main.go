@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	//"github.com/gorilla/websocket"
 	"github.com/OntoLedgy/web_interop_services/code/services/websocket"
 )
 
