@@ -2,65 +2,71 @@ package websocket
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
 )
 
+//TODO Add struct to wrap this
+
+func ServeWebSocketConnection(
+	pool *MessagePools,
+	httpResponseWriter http.ResponseWriter,
+	httpRequest *http.Request) {
+
+	fmt.Println(
+		"WebSocket Endpoint Hit")
+
+	conn, err := Upgrade(
+		httpResponseWriter,
+		httpRequest)
+
+	if err != nil {
+		fmt.Fprintf(httpResponseWriter, "%+v\n", err)
+	}
+
+	client := &WebSocketClients{
+		Conn: conn,
+		Pool: pool,
+	}
+
+	pool.Register <- client
+
+	client.Read()
+}
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
+	CheckOrigin:     func(httpRequest *http.Request) bool { return true },
 }
 
-func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
-	ws, err := upgrader.Upgrade(w, r, nil)
+func Upgrade(
+	httpResponseWriter http.ResponseWriter,
+	httpRequest *http.Request) (
+	*websocket.Conn,
+	error) {
+
+	conn, err :=
+		upgrader.Upgrade(
+			httpResponseWriter,
+			httpRequest,
+			nil)
+
 	if err != nil {
 		log.Println(err)
-		return ws, err
+		return nil, err
 	}
-	return ws, nil
+
+	return conn, nil
 }
 
-func Reader(conn *websocket.Conn) {
-	for {
-		messageType, p, err := conn.ReadMessage()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-
-		fmt.Println(string(p))
-
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
-		}
-	}
-}
-
-func Writer(conn *websocket.Conn) {
-	for {
-		fmt.Println("Sending Message ")
-		messageType, r, err := conn.NextReader()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		w, err := conn.NextWriter(messageType)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		if _, err := io.Copy(w, r); err != nil {
-			fmt.Println(err)
-			return
-		}
-		if err := w.Close(); err != nil {
-			fmt.Println(err)
-			return
-		}
+func CreateMessagePool() *MessagePools {
+	return &MessagePools{
+		Register:   make(chan *WebSocketClients),
+		Unregister: make(chan *WebSocketClients),
+		Clients:    make(map[*WebSocketClients]bool),
+		Broadcast:  make(chan Messages),
 	}
 }
